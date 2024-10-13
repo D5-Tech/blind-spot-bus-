@@ -1,0 +1,66 @@
+// Define pins for the first ultrasonic sensor
+const int trigPin1 = 2;  // Trigger pin of sensor 1
+const int echoPin1 = 3;  // Echo pin of sensor 1
+
+// Define pins for the second ultrasonic sensor
+const int trigPin2 = 4;  // Trigger pin of sensor 2
+const int echoPin2 = 5;  // Echo pin of sensor 2
+
+// Define pin for the buzzer
+const int buzzerPin = 6; // Buzzer pin
+
+void setup() {
+  // Initialize serial communication
+  Serial.begin(9600);
+
+  // Set ultrasonic sensor pins as input/output
+  pinMode(trigPin1, OUTPUT);
+  pinMode(echoPin1, INPUT);
+  pinMode(trigPin2, OUTPUT);
+  pinMode(echoPin2, INPUT);
+
+  // Set buzzer pin as output
+  pinMode(buzzerPin, OUTPUT);
+}
+
+void loop() {
+  // Get distance from both sensors
+  float distance1 = getDistance(trigPin1, echoPin1);
+  float distance2 = getDistance(trigPin2, echoPin2);
+
+  // Print distances to the serial monitor
+  Serial.print("Distance from Sensor 1: ");
+  Serial.print(distance1);
+  Serial.println(" cm");
+
+  Serial.print("Distance from Sensor 2: ");
+  Serial.print(distance2);
+  Serial.println(" cm");
+
+  // Check if any distance is less than 15 cm, turn on the buzzer if true
+  if (distance1 < 15 || distance2 < 15) {
+    digitalWrite(buzzerPin, HIGH);  // Turn on the buzzer
+  } else {
+    digitalWrite(buzzerPin, LOW);   // Turn off the buzzer
+  }
+
+  delay(500);  // Wait for a short period before taking the next reading
+}
+
+// Function to measure distance using ultrasonic sensor
+float getDistance(int trigPin, int echoPin) {
+  // Send a short pulse to trigger the sensor
+  digitalWrite(trigPin, LOW);
+  delayMicroseconds(2);
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPin, LOW);
+
+  // Measure the duration of the echo pulse
+  long duration = pulseIn(echoPin, HIGH);
+
+  // Calculate distance in cm (speed of sound is 343 m/s)
+  float distance = duration * 0.034 / 2;
+
+  return distance;
+}
